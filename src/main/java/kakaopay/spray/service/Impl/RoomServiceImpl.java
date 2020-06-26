@@ -1,13 +1,12 @@
 package kakaopay.spray.service.Impl;
 
-import kakaopay.spray.dto.ResponseDTO;
+import kakaopay.spray.dto.Response;
 import kakaopay.spray.dto.SprayDTO;
 import kakaopay.spray.entity.Room;
 import kakaopay.spray.persistence.RoomRepository;
 import kakaopay.spray.service.RoomService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -20,9 +19,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ResponseDTO valid(SprayDTO sprayDTO) {
+    public Response valid(SprayDTO sprayDTO) {
 
-        ResponseDTO res = new ResponseDTO();
+        Response res = new Response();
 
         try {
             List<Room> rooms = roomRepository.findAllByRoomId(sprayDTO.getRoomId());

@@ -1,6 +1,5 @@
 package kakaopay.spray.controller;
 
-import kakaopay.spray.dto.ResponseDTO;
 import kakaopay.spray.dto.SprayDTO;
 import kakaopay.spray.service.UserService;
 import kakaopay.spray.service.ReceiveService;
@@ -41,15 +40,14 @@ public class SprayController {
 
     /* 받기 */
     @PostMapping(value="/receive")
-    public ResponseEntity<?> receive() {
-
-        return new ResponseEntity<>("receive", HttpStatus.OK);
+    public ResponseEntity<?> receive(@RequestHeader(value="TOKEN") String token, @RequestHeader(value="X-USER-ID") BigInteger userId, @RequestHeader(value="X-ROOM-ID") String roomId) {
+        return new ResponseEntity<>(receiveService.receive(token, userId, roomId), HttpStatus.OK);
     }
 
     /* 조회 */
     @GetMapping(value="")
-    public ResponseEntity<?> check() {
-
+    public ResponseEntity<?> checkSpray(@RequestHeader(value="TOKEN") String token) {
+        
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 }

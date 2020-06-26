@@ -6,4 +6,5 @@ import java.math.BigInteger;
 
 public interface TokenService {
     Token generateToken();
+    boolean checkExpired(String createdAt, int expire);
 }

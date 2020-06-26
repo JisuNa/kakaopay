@@ -1,10 +1,9 @@
 package kakaopay.spray.service.Impl;
 
-import kakaopay.spray.dto.ResponseDTO;
+import kakaopay.spray.dto.Response;
 import kakaopay.spray.dto.SprayDTO;
 import kakaopay.spray.entity.Receive;
 import kakaopay.spray.entity.Room;
-import kakaopay.spray.entity.Spray;
 import kakaopay.spray.entity.Token;
 import kakaopay.spray.persistence.UserRepository;
 import kakaopay.spray.persistence.SprayRepository;
@@ -38,10 +37,10 @@ public class SprayServiceImpl implements SprayService {
 
     @Transactional
     @Override
-    public ResponseDTO setSpray(SprayDTO sprayDTO) {
+    public Response setSpray(SprayDTO sprayDTO) {
 
-        ResponseDTO res = new ResponseDTO();
-        Spray spray = new Spray();
+        Response res = new Response();
+        kakaopay.spray.entity.Spray spray = new kakaopay.spray.entity.Spray();
 
         try {
             List<Room> roomMember = roomService.getRooms(sprayDTO.getRoomId());

@@ -27,9 +27,16 @@ public class Receive {
     public int amount;
     @Column(name="created_at")
     public String createdAt;
+    @Column(name="updated_at")
+    public String updatedAt;
 
     @PrePersist
     public void prePersist() {
         this.createdAt = StringUtils.isEmpty(this.createdAt) ? DateUtil.getNow() : this.createdAt;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = DateUtil.getNow();
     }
 }
