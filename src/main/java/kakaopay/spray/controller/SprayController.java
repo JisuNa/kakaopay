@@ -13,7 +13,7 @@ import java.math.BigInteger;
 
 
 @RestController
-@RequestMapping(value="/spray")
+@RequestMapping(value="/api/v1/spray")
 public class SprayController {
 
     private UserService accountService;
@@ -31,10 +31,8 @@ public class SprayController {
     /* 뿌리기 */
     @PostMapping(value="")
     public ResponseEntity<?> spray(@RequestBody SprayDTO sprayDTO, @RequestHeader(value="X-USER-ID") BigInteger userId, @RequestHeader(value="X-ROOM-ID") String roomId) {
-
         sprayDTO.setUserId(userId);
         sprayDTO.setRoomId(roomId);
-
         return new ResponseEntity<>(sprayService.setSpray(sprayDTO), HttpStatus.OK);
     }
 
@@ -46,8 +44,7 @@ public class SprayController {
 
     /* 조회 */
     @GetMapping(value="")
-    public ResponseEntity<?> checkSpray(@RequestHeader(value="TOKEN") String token) {
-        
-        return new ResponseEntity<>("", HttpStatus.OK);
+    public ResponseEntity<?> checkSpray(@RequestHeader(value="TOKEN") String token, @RequestHeader(value="X-USER-ID") BigInteger userId) {
+        return new ResponseEntity<>(sprayService.getSprayAndReceive(token, userId), HttpStatus.OK);
     }
 }

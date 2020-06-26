@@ -11,6 +11,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ReceiveServiceImpl implements ReceiveService {
@@ -75,7 +77,7 @@ public class ReceiveServiceImpl implements ReceiveService {
 
             BigInteger tokenSeq = token.getSeq();
             String tokenCreatedAt = token.getCreatedAt();
-            if(tokenService.checkExpired(tokenCreatedAt, 10)) throw new Exception("해당 토큰이 만료되었습니다.");
+            if(tokenService.checkExpired(tokenCreatedAt, 10)) throw new Exception("해당 토큰은 만료되었습니다.");
 
             BigInteger userSeq = userRepository.findSeqByUserId(userId);
             BigInteger spraySeq = sprayRepository.findByTokenSeqAndUserSeq(tokenSeq, userSeq);
@@ -104,6 +106,21 @@ public class ReceiveServiceImpl implements ReceiveService {
             res.setMsg(e.getMessage());
         }
         return res;
+    }
+
+    @Override
+    public List<ReceiveDTO> getReceives(BigInteger tokenSeq) {
+
+        List<ReceiveDTO> receiveDTOList = new ArrayList<>();
+        List<Receive> receiveList = receiveRepository.findByTokenSeqAndNotNullUserSeq(tokenSeq);
+
+        for(Receive receive : receiveList) {
+            BigInteger userId = userRepository.findUserIdBySeq(receive.getUserSeq());
+            ReceiveDTO receiveDTO = new ReceiveDTO(userId, receive.getAmount());
+            receiveDTOList.add(receiveDTO);
+        }
+
+        return receiveDTOList;
     }
 
     private int random_receive(int remain_amount) {

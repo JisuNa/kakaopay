@@ -8,9 +8,12 @@ import java.math.BigInteger;
 
 public interface SprayRepository extends JpaRepository<Spray, BigInteger> {
 
-    @Query("SELECT seq FROM Spray WHERE tokenSeq = :tokenSeq")
-    BigInteger findSeqByTokenSeq(BigInteger tokenSeq);
+    Spray findByTokenSeq(BigInteger tokenSeq);
 
     @Query("SELECT seq FROM Spray WHERE tokenSeq = :tokenSeq and userSeq = :userSeq")
     BigInteger findByTokenSeqAndUserSeq(BigInteger tokenSeq, BigInteger userSeq);
+
+    @Query("SELECT userSeq FROM Spray WHERE tokenSeq = :tokenSeq")
+    BigInteger findUserSeqByTokenSeq(BigInteger tokenSeq);
+
 }

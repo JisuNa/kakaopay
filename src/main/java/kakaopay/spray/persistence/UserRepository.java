@@ -10,4 +10,7 @@ public interface UserRepository extends JpaRepository<User, BigInteger> {
 
     @Query("SELECT seq FROM User WHERE userId = :userId")
     BigInteger findSeqByUserId(BigInteger userId);
+
+    @Query("SELECT userId FROM User WHERE seq = :seq")
+    BigInteger findUserIdBySeq(BigInteger seq);
 }

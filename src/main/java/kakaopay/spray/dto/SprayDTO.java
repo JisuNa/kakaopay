@@ -11,4 +11,12 @@ public class SprayDTO {
     private String token;
     private int amount;
     private int numberOfRecipients;
+    private String status;
+    private String createdAt;
+
+    public SprayDTO(String status, int amount, String createdAt) {
+        this.status = status;
+        this.amount = amount;
+        this.createdAt = createdAt;
+    }
 }

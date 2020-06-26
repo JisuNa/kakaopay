@@ -1,10 +1,14 @@
 package kakaopay.spray.service.Impl;
 
+import kakaopay.spray.dto.ReceiveDTO;
 import kakaopay.spray.dto.Response;
 import kakaopay.spray.dto.SprayDTO;
+import kakaopay.spray.dto.SprayInfoDTO;
 import kakaopay.spray.entity.Receive;
 import kakaopay.spray.entity.Room;
+import kakaopay.spray.entity.Spray;
 import kakaopay.spray.entity.Token;
+import kakaopay.spray.persistence.TokenRepository;
 import kakaopay.spray.persistence.UserRepository;
 import kakaopay.spray.persistence.SprayRepository;
 import kakaopay.spray.service.*;
@@ -25,14 +29,16 @@ public class SprayServiceImpl implements SprayService {
     private TokenService tokenService;
     private UserRepository userRepository;
     private SprayRepository sprayRepository;
+    private TokenRepository tokenRepository;
 
-    public SprayServiceImpl(SprayRepository sprayRepository, UserRepository userRepository, UserService userService, RoomServiceImpl roomService, ReceiveService receiveService, TokenService tokenService) {
+    public SprayServiceImpl(SprayRepository sprayRepository, UserRepository userRepository, UserService userService, RoomServiceImpl roomService, ReceiveService receiveService, TokenService tokenService, TokenRepository tokenRepository) {
         this.userService = userService;
         this.sprayRepository = sprayRepository;
         this.userRepository = userRepository;
         this.roomService = roomService;
         this.receiveService = receiveService;
         this.tokenService = tokenService;
+        this.tokenRepository = tokenRepository;
     }
 
     @Transactional
@@ -75,5 +81,48 @@ public class SprayServiceImpl implements SprayService {
         }
 
         return res;
+    }
+
+    @Override
+    public Response getSprayAndReceive(String requestToken, BigInteger userId) {
+
+        Response res = new Response();
+        try {
+            // 뿌린사람인지 확인 - token 뒤지고, spray 뒤지고
+            Token token = tokenRepository.findByToken(requestToken);
+            if(ObjectUtils.isEmpty(token)) throw new Exception("유효하지 않은 토큰입니다.");
+
+            // 토큰 만료 체크
+            if(tokenService.checkExpired(token.getCreatedAt(), 10080)) throw new Exception("해당 토큰은 만료되었습니다.");
+
+            BigInteger tokenSeq = token.getSeq();
+            BigInteger userSeq = userRepository.findSeqByUserId(userId);
+
+            BigInteger sprayUserSeq = sprayRepository.findUserSeqByTokenSeq(tokenSeq);
+            if(!userSeq.equals(sprayUserSeq)) throw new Exception("뿌리기 등록자만 조회가 가능합니다.");
+
+            //현재상태, 뿌린시각, 뿌린금액, 받기완료된 금액, 받기완료된 정보
+            List<ReceiveDTO> receiveList = receiveService.getReceives(tokenSeq);
+            SprayInfoDTO sprayInfoDTO = getSpray(tokenSeq);
+            sprayInfoDTO.setReceivedList(receiveList);
+
+            int totalReceived = 0;
+            for(ReceiveDTO receiveDTO : receiveList) {
+                totalReceived += receiveDTO.getAmount();
+            }
+            sprayInfoDTO.setTotalReceived(totalReceived);
+            res.setCode(200);
+            res.setData(sprayInfoDTO);
+        } catch(Exception e) {
+            e.printStackTrace();
+            res.setCode(500);
+            res.setData(e.getMessage());
+        }
+        return res;
+    }
+
+    public SprayInfoDTO getSpray(BigInteger tokenSeq) {
+        Spray spray = sprayRepository.findByTokenSeq(tokenSeq);
+        return new SprayInfoDTO(spray.getAmount(), spray.getStatus(), spray.getCreatedAt());
     }
 }
