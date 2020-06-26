@@ -16,4 +16,7 @@ public interface ReceiveRepository extends JpaRepository<Receive, BigInteger> {
 
     @Query("SELECT r FROM Receive r WHERE r.tokenSeq=:tokenSeq AND r.userSeq is not null")
     List<Receive> findByTokenSeqAndNotNullUserSeq(BigInteger tokenSeq);
+
+    @Query("SELECT r FROM Receive r WHERE r.tokenSeq=:tokenSeq AND r.userSeq is null")
+    List<Receive> findByTokenSeqAndNullUserSeq(BigInteger tokenSeq);
 }

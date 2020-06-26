@@ -87,6 +87,7 @@ public class SprayServiceImpl implements SprayService {
     public Response getSprayAndReceive(String requestToken, BigInteger userId) {
 
         Response res = new Response();
+
         try {
             // 뿌린사람인지 확인 - token 뒤지고, spray 뒤지고
             Token token = tokenRepository.findByToken(requestToken);

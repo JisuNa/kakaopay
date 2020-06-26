@@ -3,6 +3,7 @@ package kakaopay.spray.service.Impl;
 import kakaopay.spray.dto.ReceiveDTO;
 import kakaopay.spray.dto.Response;
 import kakaopay.spray.entity.Receive;
+import kakaopay.spray.entity.Spray;
 import kakaopay.spray.entity.Token;
 import kakaopay.spray.persistence.*;
 import kakaopay.spray.service.ReceiveService;
@@ -66,7 +67,7 @@ public class ReceiveServiceImpl implements ReceiveService {
 
         Response res = new Response();
 
-        //토큰이 10분 지났는 --
+        //토큰이 10분 지났는지 --
         //자신이 뿌리기 한건지 --
         //뿌린사람의 방에 있는사람인지 --
         //이미 받은 내역이 있는지 --
@@ -80,8 +81,8 @@ public class ReceiveServiceImpl implements ReceiveService {
             if(tokenService.checkExpired(tokenCreatedAt, 10)) throw new Exception("해당 토큰은 만료되었습니다.");
 
             BigInteger userSeq = userRepository.findSeqByUserId(userId);
-            BigInteger spraySeq = sprayRepository.findByTokenSeqAndUserSeq(tokenSeq, userSeq);
-            if(ObjectUtils.isNotEmpty(spraySeq)) throw new Exception("자신이 뿌리기한 건은 받을 수 없습니다.");
+            Spray spray = sprayRepository.findByTokenSeq(tokenSeq);
+            if(spray.getUserSeq() == userSeq) throw new Exception("자신이 뿌리기한 건은 받을 수 없습니다.");
 
             BigInteger roomSeq = roomRepository.findByRoomIdAndUserSeq(roomId, userSeq);
             if(ObjectUtils.isEmpty(roomSeq)) throw new Exception("올바르지 않은 접근입니다.");
@@ -91,11 +92,18 @@ public class ReceiveServiceImpl implements ReceiveService {
             if(ObjectUtils.isNotEmpty(receiveSeq)) throw new Exception("이미 받은 내역이 존재합니다.");
 
             // 받을수 있는 뿌리기 확인
-            Receive receive = receiveRepository.findByTokenSeq(tokenSeq).get(0);
-            if(ObjectUtils.isEmpty(receive)) throw new Exception("받을 수 있는 뿌리기가 없습니다.");
+            List<Receive> receiveList = receiveRepository.findByTokenSeqAndNullUserSeq(tokenSeq);
+            if(ObjectUtils.isEmpty(receiveList)) throw new Exception("받을 수 있는 뿌리기가 없습니다.");
 
+            Receive receive = receiveList.get(0);
             receive.setUserSeq(userSeq);
             receive = receiveRepository.save(receive);
+
+            // 마지막 남은 받기일 때
+            if(receiveList.size() == 1) {
+                spray.setStatus("COMPLETE");
+                sprayRepository.save(spray);
+            }
 
             ReceiveDTO receiveDTO = new ReceiveDTO(userId, receive.getAmount());
 
