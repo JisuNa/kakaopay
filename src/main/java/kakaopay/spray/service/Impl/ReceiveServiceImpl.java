@@ -75,6 +75,7 @@ public class ReceiveServiceImpl implements ReceiveService {
 
         try {
             Token token = tokenRepository.findByToken(requestToken);
+            if(ObjectUtils.isEmpty(token)) throw new Exception("잘못된 토큰입니다.");
 
             BigInteger tokenSeq = token.getSeq();
             String tokenCreatedAt = token.getCreatedAt();
@@ -83,18 +84,19 @@ public class ReceiveServiceImpl implements ReceiveService {
             BigInteger userSeq = userRepository.findSeqByUserId(userId);
             Spray spray = sprayRepository.findByTokenSeq(tokenSeq);
             if(ObjectUtils.isEmpty(spray)) throw new Exception("토큰에 해당하는 뿌리기가 없습니다.");
+            if("COMPLETE".equals(spray.getStatus())) throw new Exception("뿌리기가 완료됐습니다.");
             if(userSeq.equals(spray.getUserSeq())) throw new Exception("자신이 뿌리기한 건은 받을 수 없습니다.");
 
             BigInteger roomSeq = roomRepository.findByRoomIdAndUserSeq(roomId, userSeq);
             if(ObjectUtils.isEmpty(roomSeq)) throw new Exception("뿌리기한 사람과 같은방에 있어야 합니다.");
-
-            //받은내역은 tokenSeq, userSeq로 조회해서 있으면
-            BigInteger receiveSeq = receiveRepository.findByTokenSeqAndUserSeq(tokenSeq, userSeq);
-            if(ObjectUtils.isNotEmpty(receiveSeq)) throw new Exception("이미 받은 내역이 존재합니다.");
-
+            
             // 받을수 있는 뿌리기 확인
-            List<Receive> receiveList = receiveRepository.findByTokenSeqAndNullUserSeq(tokenSeq);
+            List<Receive> receiveList = receiveRepository.findByTokenSeq(tokenSeq);
             if(ObjectUtils.isEmpty(receiveList)) throw new Exception("받을 수 있는 뿌리기가 없습니다.");
+
+            for(Receive receive : receiveList) {
+                if(userSeq.equals(receive.getUserSeq())) throw new Exception("이미 받은 내역이 존재합니다.");
+            }
 
             Receive receive = receiveList.get(0);
             receive.setUserSeq(userSeq);
