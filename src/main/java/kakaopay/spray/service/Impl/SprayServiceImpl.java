@@ -64,7 +64,7 @@ public class SprayServiceImpl implements SprayService {
             }
             if(!isJoinedRoom) throw new Exception("요청자는 해당방에 있지 않습니다.");
 
-            if(roomMemberSize > sprayDTO.getNumberOfRecipients()) throw new Exception("뿌리기 받는 인원 수는 방 인원 수보다 많을 수 없습니다.");
+            if(roomMemberSize < sprayDTO.getNumberOfRecipients()) throw new Exception("뿌리기 받는 인원 수는 방 인원 수보다 많을 수 없습니다.");
 
             Token token = tokenService.generateToken();
             if(StringUtils.isEmpty(token.getToken())) throw new Exception("토큰 생성에 문제가 발생했습니다.");
@@ -74,9 +74,11 @@ public class SprayServiceImpl implements SprayService {
             spray.setAmount(sprayDTO.getAmount());
             spray.setTokenSeq(token.getSeq());
             spray.setNumberOfRecipients(sprayDTO.getNumberOfRecipients());
-            sprayRepository.save(spray);
+            Spray sprayInfo = sprayRepository.save(spray);
 
             sprayDTO.setToken(token.getToken());
+            sprayDTO.setCreatedAt(sprayInfo.getCreatedAt());
+            sprayDTO.setStatus(sprayInfo.getStatus());
 
             Receive receive = receiveService.initReceive(token.getSeq(), userSeq, sprayDTO.getAmount(), sprayDTO.getNumberOfRecipients());
             if(ObjectUtils.isEmpty(receive)) throw new Exception("뿌리기 분배중 오류가 발생하였습니다.");
@@ -124,7 +126,7 @@ public class SprayServiceImpl implements SprayService {
             res.setData(sprayInfoDTO);
         } catch(Exception e) {
             e.printStackTrace();
-            res.setCode(500);
+            res.setCode(400);
             res.setData(e.getMessage());
         }
         return res;
