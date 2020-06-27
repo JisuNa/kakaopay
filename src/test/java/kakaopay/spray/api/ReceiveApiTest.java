@@ -85,8 +85,8 @@ class ReceiveApiTest {
     @Test
     void receiveCheckOwnSpray() throws Exception{
 
-        BigInteger userId = BigInteger.valueOf(20200627000003L);
-        String roomId = "dev";
+        userId = "20200627000003";
+        roomId = "dev";
         token = "1ZO5x-H4sJX-RjCSZ";
 
         mockMvc.perform(
@@ -106,7 +106,7 @@ class ReceiveApiTest {
     @Test
     void receiveCheckDuplication() throws Exception{
 
-        BigInteger userId = BigInteger.valueOf(20200627000001L);
+        userId = "20200627000001";
         roomId = "dev";
         token = "1ZO5x-H4sJX-RjCSZ";
 
@@ -127,7 +127,7 @@ class ReceiveApiTest {
     @Test
     void receiveCheckSameRoom() throws Exception{
 
-        BigInteger userId = BigInteger.valueOf(20200627000007L);
+        userId = "20200627000007";
         roomId = "dev";
         token = "1ZO5x-H4sJX-RjCSZ";
 

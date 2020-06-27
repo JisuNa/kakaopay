@@ -73,8 +73,8 @@ class SprayApiTest {
         sprayDTO.setAmount(Integer.parseInt(amount));
         sprayDTO.setNumberOfRecipients(Integer.parseInt(numberOfRecipients));
 
-        BigInteger userId = BigInteger.valueOf(20200627000010L);
-        String roomId = "dev";
+        userId = "20200627000010";
+        roomId = "dev";
 
         mockMvc.perform(
                 post("/api/v1/spray")
@@ -96,8 +96,8 @@ class SprayApiTest {
         sprayDTO.setAmount(Integer.parseInt(amount));
         sprayDTO.setNumberOfRecipients(Integer.parseInt(numberOfRecipients));
 
-        BigInteger userId = BigInteger.valueOf(2020062700001L);
-        String roomId = "hr";
+        userId = "20200627000001";
+        roomId = "hr";
 
         mockMvc.perform(
                 post("/api/v1/spray")
@@ -119,8 +119,8 @@ class SprayApiTest {
         sprayDTO.setAmount(Integer.parseInt(amount));
         sprayDTO.setNumberOfRecipients(Integer.parseInt(numberOfRecipients));
 
-        BigInteger userId = BigInteger.valueOf(20200627000005L);
-        String roomId = "dev";
+        userId = "20200627000005";
+        roomId = "dev";
 
         mockMvc.perform(
                 post("/api/v1/spray")
@@ -142,8 +142,8 @@ class SprayApiTest {
         sprayDTO.setAmount(Integer.parseInt(amount));
         sprayDTO.setNumberOfRecipients(5);
 
-        BigInteger userId = BigInteger.valueOf(20200627000001L);
-        String roomId = "dev";
+        userId = "20200627000001";
+        roomId = "dev";
 
         mockMvc.perform(
                 post("/api/v1/spray")
