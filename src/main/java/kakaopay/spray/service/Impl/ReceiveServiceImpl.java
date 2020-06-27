@@ -86,7 +86,7 @@ public class ReceiveServiceImpl implements ReceiveService {
             if(userSeq.equals(spray.getUserSeq())) throw new Exception("자신이 뿌리기한 건은 받을 수 없습니다.");
 
             BigInteger roomSeq = roomRepository.findByRoomIdAndUserSeq(roomId, userSeq);
-            if(ObjectUtils.isEmpty(roomSeq)) throw new Exception("올바르지 않은 접근입니다.");
+            if(ObjectUtils.isEmpty(roomSeq)) throw new Exception("뿌리기한 사람과 같은방에 있어야 합니다.");
 
             //받은내역은 tokenSeq, userSeq로 조회해서 있으면
             BigInteger receiveSeq = receiveRepository.findByTokenSeqAndUserSeq(tokenSeq, userSeq);

@@ -1,4 +1,4 @@
-package kakaopay.spray.controller;
+package kakaopay.spray.api;
 
 import kakaopay.spray.dto.SprayDTO;
 import kakaopay.spray.service.UserService;

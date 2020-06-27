@@ -99,7 +99,6 @@ public class SprayServiceImpl implements SprayService {
         Response res = new Response();
 
         try {
-            // 뿌린사람인지 확인 - token 뒤지고, spray 뒤지고
             Token token = tokenRepository.findByToken(requestToken);
             if(ObjectUtils.isEmpty(token)) throw new Exception("유효하지 않은 토큰입니다.");
 
@@ -125,9 +124,8 @@ public class SprayServiceImpl implements SprayService {
             res.setCode(200);
             res.setData(sprayInfoDTO);
         } catch(Exception e) {
-            e.printStackTrace();
             res.setCode(400);
-            res.setData(e.getMessage());
+            res.setMsg(e.getMessage());
         }
         return res;
     }
