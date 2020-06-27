@@ -49,14 +49,22 @@ public class SprayServiceImpl implements SprayService {
         kakaopay.spray.entity.Spray spray = new kakaopay.spray.entity.Spray();
 
         try {
+            BigInteger userSeq = userService.getSeq(sprayDTO.getUserId());
+            if(ObjectUtils.isEmpty(userSeq)) throw new Exception("존재하지 않은 유저ID입니다.");
+
             List<Room> roomMember = roomService.getRooms(sprayDTO.getRoomId());
 
             int roomMemberSize = roomMember.size();
-            if(roomMemberSize < 1) throw new Exception("존재하지 않은 Rood ID 입니다.");
-            if(roomMemberSize > sprayDTO.getNumberOfRecipients()) throw new Exception("방 인원수보다 많을 수 없습니다.");
+            if(roomMemberSize < 1) throw new Exception("존재하지 않은 Room ID 입니다.");
 
-            BigInteger userSeq = userService.getSeq(sprayDTO.getUserId());
-            if(ObjectUtils.isEmpty(userSeq)) throw new Exception("존재하지 않은 유저ID입니다.");
+            boolean isJoinedRoom = false;
+            for(Room room : roomMember) {
+                isJoinedRoom = userSeq.equals(room.getUserSeq());
+                if(isJoinedRoom) break;
+            }
+            if(!isJoinedRoom) throw new Exception("요청자는 해당방에 있지 않습니다.");
+
+            if(roomMemberSize > sprayDTO.getNumberOfRecipients()) throw new Exception("뿌리기 받는 인원 수는 방 인원 수보다 많을 수 없습니다.");
 
             Token token = tokenService.generateToken();
             if(StringUtils.isEmpty(token.getToken())) throw new Exception("토큰 생성에 문제가 발생했습니다.");

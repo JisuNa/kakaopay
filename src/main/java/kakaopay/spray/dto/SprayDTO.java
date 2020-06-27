@@ -14,6 +14,8 @@ public class SprayDTO {
     private String status;
     private String createdAt;
 
+    public SprayDTO(){}
+
     public SprayDTO(String status, int amount, String createdAt) {
         this.status = status;
         this.amount = amount;
