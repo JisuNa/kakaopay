@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -21,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "X-USER-ID=20200627000002"
                 , "X-ROOM-ID=a"
-                , "TOKEN=WvnSC-XAE7O-E6sXe"
+                , "TOKEN=1ZO5x-H4sJX-RjCSZ"
                 , "amount=10000"
                 , "numberOfRecipients=4"
         }
@@ -41,6 +44,7 @@ class SprayControllerTest {
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
+    @Transactional
     void spray() throws Exception {
 
         SprayDTO sprayDTO = new SprayDTO();
@@ -54,8 +58,7 @@ class SprayControllerTest {
                         .header("X-USER-ID", userId)
                         .header("X-ROOM-ID", roomId)
                         .content(mapper.writeValueAsString(sprayDTO))
-        )
-                .andDo(print())
+        ).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.data.token").isNotEmpty())
@@ -63,10 +66,35 @@ class SprayControllerTest {
     }
 
     @Test
-    void receive() {
+    @Transactional
+    void receive() throws Exception{
+
+        mockMvc.perform(
+                post("/api/v1/spray/receive")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("TOKEN", token)
+                        .header("X-USER-ID", userId)
+                        .header("X-ROOM-ID", roomId)
+        ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.data.amount").isNotEmpty())
+        ;
     }
 
     @Test
-    void checkSpray() {
+    void checkSpray() throws Exception{
+        mockMvc.perform(
+                get("/api/v1/spray")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("TOKEN", token)
+                        .header("X-USER-ID", userId)
+        ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.data").isNotEmpty())
+        ;
     }
 }
